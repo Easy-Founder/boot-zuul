@@ -78,7 +78,8 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 			}
 		}
 		if(isUploadFile) {
-			ctx.setSendZuulResponse(true); //对请求进行路由
+			//对请求进行路由
+			ctx.setSendZuulResponse(true);
 			ctx.setResponseStatusCode(200);
 			ctx.set("isSuccess", true);
 			return null;
@@ -90,7 +91,8 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 			body =	StreamUtils.copyToString(in, Charset.forName("UTF-8"));
 			log.info("请求参数:{}",body);
 			if(StringUtils.isEmpty(body)) {
-				ctx.setSendZuulResponse(true); //对请求进行路由
+				//对请求进行路由
+				ctx.setSendZuulResponse(true);
 				ctx.setResponseStatusCode(200);
 				ctx.set("isSuccess", true);
 				return null;
@@ -98,7 +100,8 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 			String newBody = "";
 			Map<String, Object> stringObjectMap = cleanXSS(null==body?"":body);
 			JSONObject json = (JSONObject) JSONObject.toJSON(stringObjectMap);
-			newBody = json.toString(); // 如果存在sql注入,直接拦截请求
+			// 如果存在sql注入,直接拦截请求
+			newBody = json.toString();
 			if (newBody.contains("forbid")) {
 				log.info("sql 注入请求被拦截，直接返回");
 				setUnauthorizedResponse(ctx);
@@ -122,7 +125,8 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 				}
 			});
 		} catch (IOException e) {
-			ctx.setSendZuulResponse(false); //不对其进行路由
+			//不对其进行路由
+			ctx.setSendZuulResponse(false);
 			ctx.setResponseStatusCode(200);
 			ctx.setResponseBody("{\"code\":500,\"message\":\"内部异常\",\"data\":null}");
 			ctx.set("isSuccess", false);
@@ -169,14 +173,10 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 		}
 		return mapjson;
 	}
-	public static void main(String[] args) {
-		String str = "{'custCd':'G100014','custName':'上海沪心公寓管理有限公司','paymentStatus':'1','email':'12','custAddress':'2121','iscredit':'1','managerOrg':'','belongContract':'','belongAgent':'','businessSort':'1212','businessBrand':'1212','belongOrg':'','entscale':'','orgType':'','orgCateGory':'','economicType':'','zzcode':null,'regAddress':'','regProvince':'','businessAddress':null,'bizType':''}";
-		cleanXSS(str);
-	}
-
 	/** * 设置500拦截状态 */
 	private void setUnauthorizedResponse(RequestContext ctx) {
-		ctx.setSendZuulResponse(false); //不对其进行路由
+		//不对其进行路由
+		ctx.setSendZuulResponse(false);
 		ctx.setResponseStatusCode(400);
 		ctx.setResponseBody("{\"code\":500,\"message\":\"请求参数非法\",\"data\":null}");
 		ctx.set("isSuccess", false);
