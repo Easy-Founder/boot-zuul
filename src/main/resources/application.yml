@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: boot-zuul
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1MB
+      max-request-size: 10MB
+      location: /data/boot/zuul/temp
+  profiles:
+    active:
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://boot:boot@localhost:11101/eureka/
+    healthCheck:  # 健康检查
+      enabled: true
+  instance:
+    prefer-ip-address: true
+
+
+zuul:
+  retryable: true
+  sensitive-headers: Access-Control-Allow-Origin
+  #主要用于跨域请求，下游请求忽略跨域请求头
+  ignored-headers: Access-Control-Allow-Origin,H-APP-Id,Token,APPToken
+  routes:
+    api-xxx:
+      strip-prefix: true
+      sensitiveHeaders:
+      path: /api-xxx/**
+      serviceId: boot-xxx
+    api-sss:
+      strip-prefix: true
+      sensitiveHeaders:
+      path: /api-sss/**
+      serviceId: boot-sss
+  host:
+    #如果路由方式是serviceId的方式，那么ribbon的生效，如果是url的方式，则zuul.host开头的生效
+    connect-timeout-millis: 60000
+    socket-timeout-millis: 60000
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
+  #对当前服务的重试次数
+  MaxAutoRetries: 2
+  #切换相同Server的次数
+  MaxAutoRetriesNextServer: 1
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+
+
+server:
+  port: 11201
+  undertow:
+    accesslog:
+      enabled: false
+      dir: logs
+    direct-buffers: true
+    buffer-size: 1024
+    url-charset: UTF-8
+    threads:
+      io: 8
+      worker: 64
+
+
+logging:
+  config: classpath:logback-spring.xml
