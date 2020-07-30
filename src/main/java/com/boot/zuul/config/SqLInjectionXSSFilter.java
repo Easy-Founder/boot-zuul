@@ -52,7 +52,6 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 		RequestContext ctx = RequestContext.getCurrentContext();
 		HttpServletRequest request = ctx.getRequest();
 		log.info("--->>> SqLInjectionXSSFilter {},{}", request.getMethod(), request.getRequestURL().toString());
-
 		StringBuilder params = new StringBuilder("?");
 		Enumeration<String> names = request.getParameterNames();
 		if( request.getMethod().equals("GET") ) {
@@ -78,8 +77,7 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 			}
 		}
 		if(isUploadFile) {
-			//对请求进行路由
-			ctx.setSendZuulResponse(true);
+			ctx.setSendZuulResponse(true); //对请求进行路由
 			ctx.setResponseStatusCode(200);
 			ctx.set("isSuccess", true);
 			return null;
@@ -91,8 +89,7 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 			body =	StreamUtils.copyToString(in, Charset.forName("UTF-8"));
 			log.info("请求参数:{}",body);
 			if(StringUtils.isEmpty(body)) {
-				//对请求进行路由
-				ctx.setSendZuulResponse(true);
+				ctx.setSendZuulResponse(true); //对请求进行路由
 				ctx.setResponseStatusCode(200);
 				ctx.set("isSuccess", true);
 				return null;
@@ -125,8 +122,7 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 				}
 			});
 		} catch (IOException e) {
-			//不对其进行路由
-			ctx.setSendZuulResponse(false);
+			ctx.setSendZuulResponse(false); //不对其进行路由
 			ctx.setResponseStatusCode(200);
 			ctx.setResponseBody("{\"code\":500,\"message\":\"内部异常\",\"data\":null}");
 			ctx.set("isSuccess", false);
@@ -173,10 +169,10 @@ public class SqLInjectionXSSFilter extends ZuulFilter {
 		}
 		return mapjson;
 	}
+
 	/** * 设置500拦截状态 */
 	private void setUnauthorizedResponse(RequestContext ctx) {
-		//不对其进行路由
-		ctx.setSendZuulResponse(false);
+		ctx.setSendZuulResponse(false); //不对其进行路由
 		ctx.setResponseStatusCode(400);
 		ctx.setResponseBody("{\"code\":500,\"message\":\"请求参数非法\",\"data\":null}");
 		ctx.set("isSuccess", false);
